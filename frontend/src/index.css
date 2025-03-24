@@ -1,0 +1,106 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 17% 6%;
+    --foreground: 240 5% 95%;
+
+    --card: 240 17% 9%;
+    --card-foreground: 240 5% 95%;
+
+    --popover: 240 17% 9%;
+    --popover-foreground: 240 5% 95%;
+
+    --primary: 217 100% 50%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 12% 16%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 240 12% 16%;
+    --muted-foreground: 240 5% 64%;
+
+    --accent: 191 100% 50%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 346 100% 62%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 240 14% 20%;
+    --input: 240 14% 20%;
+    --ring: 240 14% 20%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border selection:bg-spark-blue/20 selection:text-white;
+  }
+
+  body {
+    @apply bg-spark-dark text-spark-gray-100 antialiased;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .glass-card {
+    @apply bg-spark-dark-600/60 backdrop-blur-lg border border-spark-dark-500/50 shadow-lg;
+  }
+  
+  .glass-panel {
+    @apply bg-spark-dark-700/80 backdrop-blur-lg border border-spark-dark-500/50 shadow-lg;
+  }
+  
+  .text-gradient-blue {
+    @apply bg-gradient-to-r from-spark-blue to-spark-cyan bg-clip-text text-transparent;
+  }
+  
+  .text-shadow-blue {
+    text-shadow: 0 0 10px rgba(0, 104, 255, 0.5);
+  }
+  
+  .pulse-ring::before {
+    content: '';
+    @apply absolute inset-0 rounded-full border border-spark-blue/50 animate-pulse-ring;
+  }
+  
+  .scanning-line {
+    @apply absolute left-0 right-0 h-1 bg-spark-cyan/80 animate-scanning;
+  }
+  
+  .matrix-bg {
+    background-image: linear-gradient(rgba(0, 224, 255, 0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0, 224, 255, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .cyber-grid {
+    background-image: linear-gradient(rgba(0, 104, 255, 0.1) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0, 104, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .typing-animation {
+    @apply overflow-hidden whitespace-nowrap border-r-2 border-spark-blue;
+    animation: typing 3.5s steps(40, end), cursor-blink 0.75s step-end infinite;
+  }
+}
