@@ -1,8 +1,6 @@
 import React from 'react';
 import {
   File,
-  Globe,
-  Clock,
   ShieldCheck,
   AlertTriangle,
   XCircle,
@@ -51,8 +49,8 @@ const ScanDetailsItem: React.FC<ScanDetailsItemProps> = ({
           {risk === 'safe'
             ? 'Safe'
             : risk === 'warning'
-            ? 'Suspicious'
-            : 'Malicious'}
+              ? 'Suspicious'
+              : 'Malicious'}
         </span>
       </div>
     );

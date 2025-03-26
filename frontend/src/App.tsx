@@ -11,6 +11,7 @@ import IPScanner from './pages/IPScanner';
 import PhishingDetector from './pages/PhishingDetector';
 import CodeRepair from './pages/CodeRepair';
 import NotFound from './pages/NotFound';
+import { Layout } from './components/Layout';
 
 // const queryClient = new QueryClient();
 
@@ -18,31 +19,34 @@ import NotFound from './pages/NotFound';
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Index />,
-  },
-  {
-    path: '/file-scanner',
-    element: <FileScanner />,
-  },
-  {
-    path: '/url-scanner',
-    element: <URLScanner />,
-  },
-  {
-    path: '/domain-scanner',
-    element: <DomainScanner />,
-  },
-  {
-    path: '/ip-scanner',
-    element: <IPScanner />,
-  },
-  {
-    path: '/phishing-detector',
-    element: <PhishingDetector />,
-  },
-  {
-    path: '/code-repair',
-    element: <CodeRepair />,
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: <FileScanner />,
+      },
+      {
+        path: '/url-scanner',
+        element: <URLScanner />,
+      },
+      {
+        path: '/domain-scanner',
+        element: <DomainScanner />,
+      },
+      {
+        path: '/ip-scanner',
+        element: <IPScanner />,
+      },
+      {
+        path: '/phishing-detector',
+        element: <PhishingDetector />,
+      },
+      {
+        path: '/code-repair',
+        element: <CodeRepair />,
+      },
+
+    ]
   },
   {
     // Catch-all route for not found pages

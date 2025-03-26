@@ -5,7 +5,6 @@ import {
   HomeIcon,
   LinkIcon,
   Menu,
-  PanelLeft,
   ScreenShareOff,
   Server,
   Shield,
@@ -38,15 +37,15 @@ export const Navigation = () => {
   }, []);
 
   const navItems = [
-    {
-      name: 'Dashboard',
-      icon: <HomeIcon size={20} />,
-      path: '/',
-    },
+    // {
+    //   name: 'Dashboard',
+    //   icon: <HomeIcon size={20} />,
+    //   path: '/',
+    // },
     {
       name: 'File Scanner',
       icon: <FileSearch size={20} />,
-      path: '/file-scanner',
+      path: '/',
     },
     {
       name: 'URL Scanner',
@@ -110,11 +109,9 @@ export const Navigation = () => {
         initial={{ x: -10, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        className={`${
-          collapsed ? 'w-16' : 'w-64'
-        } transition-all duration-300 ease-in-out h-screen glass-panel fixed md:relative z-30 ${
-          mobileOpen ? 'left-0' : '-left-full md:left-0'
-        }`}
+        className={`${collapsed ? 'w-16' : 'w-64'
+          } transition-all duration-300 ease-in-out h-screen glass-panel fixed md:relative z-30 ${mobileOpen ? 'left-0' : '-left-full md:left-0'
+          }`}
       >
         <div className="flex flex-col h-full py-6">
           <div className="flex items-center px-4 mb-6">
@@ -138,12 +135,12 @@ export const Navigation = () => {
                 <Shield size={24} className="text-spark-blue" />
               </div>
             )}
-            <button
-              onClick={() => setCollapsed(!collapsed)}
-              className="hidden p-1 ml-auto transition-colors text-spark-gray-300 hover:text-white md:block"
-            >
-              <PanelLeft size={18} />
-            </button>
+            {/* <button */}
+            {/*   onClick={() => setCollapsed(!collapsed)} */}
+            {/*   className="hidden p-1 ml-auto transition-colors text-spark-gray-300 hover:text-white md:block" */}
+            {/* > */}
+            {/*   <PanelLeft size={18} /> */}
+            {/* </button> */}
             <button
               onClick={() => setMobileOpen(false)}
               className="p-1 ml-auto transition-colors text-spark-gray-300 hover:text-white md:hidden"
@@ -158,24 +155,21 @@ export const Navigation = () => {
                 <li key={item.name}>
                   <Link
                     to={item.path}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 ${
-                      isActive(item.path)
-                        ? 'bg-spark-blue/10 text-white'
-                        : 'text-spark-gray-300 hover:bg-spark-dark-500/70 hover:text-white'
-                    } ${collapsed ? 'justify-center' : 'justify-start'}`}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 ${isActive(item.path)
+                      ? 'bg-spark-blue/10 text-white'
+                      : 'text-spark-gray-300 hover:bg-spark-dark-500/70 hover:text-white'
+                      } ${collapsed ? 'justify-center' : 'justify-start'}`}
                   >
                     <span
-                      className={`${
-                        isActive(item.path) ? 'text-spark-blue' : ''
-                      }`}
+                      className={`${isActive(item.path) ? 'text-spark-blue' : ''
+                        }`}
                     >
                       {item.icon}
                     </span>
                     {!collapsed && (
                       <span
-                        className={`text-sm ${
-                          isActive(item.path) ? 'font-medium' : ''
-                        }`}
+                        className={`text-sm ${isActive(item.path) ? 'font-medium' : ''
+                          }`}
                       >
                         {item.name}
                       </span>
@@ -194,9 +188,8 @@ export const Navigation = () => {
 
           <div className="px-4 mt-auto">
             <div
-              className={`glass-card p-3 rounded-lg ${
-                collapsed ? 'text-center' : ''
-              }`}
+              className={`glass-card p-3 rounded-lg ${collapsed ? 'text-center' : ''
+                }`}
             >
               {!collapsed ? (
                 <div>

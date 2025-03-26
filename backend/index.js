@@ -34,7 +34,7 @@ const VT_HEADERS = { 'x-apikey': process.env.VIRUSTOTAL_API_KEY };
 
 // Polling configuration
 const MAX_POLLING_ATTEMPTS = 20;
-const POLLING_INTERVAL = 5000; // 3 seconds
+const POLLING_INTERVAL = 10000; // 3 seconds
 
 // Helper function to poll for completed results
 async function pollForResults(scan_id) {
@@ -57,8 +57,7 @@ async function pollForResults(scan_id) {
       console.log(`✅ Analysis completed after ${attempts} attempts`);
     } else {
       console.log(
-        `⏳ Analysis status: ${
-          reportResponse.data.data.attributes.status
+        `⏳ Analysis status: ${reportResponse.data.data.attributes.status
         }. Waiting ${POLLING_INTERVAL / 1000} seconds...`
       );
       await new Promise((resolve) => setTimeout(resolve, POLLING_INTERVAL));
@@ -466,6 +465,7 @@ app.post('/detect-clone', upload.single('image'), async (req, res) => {
             {
               text: `Analyze this website screenshot and determine if it's a fake or a cloned site.
               Provide the following structured data in JSON format:
+              - give domain name of that website if it exists ,if not provide not found
               - legitimacy_score (0-100, with 100 being most legit)
               - red_flags (list of any suspicious elements)
               - verified_elements (list of elements that match a real site)

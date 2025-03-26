@@ -1,11 +1,13 @@
 
 import { Dashboard } from "@/components/Dashboard";
 import { Layout } from "@/components/Layout";
+import { Outlet } from "react-router-dom";
 
 const Index = () => {
   return (
     <Layout>
-      <Dashboard />
+      <Outlet></Outlet>
+      {/* <Dashboard /> */}
     </Layout>
   );
 };

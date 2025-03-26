@@ -1,14 +1,10 @@
 import { motion } from 'framer-motion';
 import { ReactNode, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Loader } from './Loader';
 import { Navigation } from './Navigation';
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-export const Layout = ({ children }: LayoutProps) => {
+export const Layout = () => {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
 
@@ -31,15 +27,15 @@ export const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="relative min-h-screen overflow-hidden bg-spark-dark">
       <div className="absolute inset-0 z-0 cyber-grid opacity-20"></div>
-      <div className="relative z-10 flex min-h-screen">
+      <div className="relative z-10 flex h-screen ">
         <Navigation />
         <motion.main
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="flex-1 p-4 overflow-hidden md:p-6 lg:p-8"
+          className="flex-1  overflow-y-auto p-8"
         >
-          {children}
+          <Outlet />
         </motion.main>
       </div>
     </div>

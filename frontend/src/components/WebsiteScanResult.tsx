@@ -1,4 +1,3 @@
-import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Shield,
@@ -33,13 +32,43 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
   //     full_analysis:
   //       'The screenshot appears to be a legitimate Flipkart website. The URL in the address bar is flipkart.com. The site features the Flipkart logo, a prominent search bar, and familiar category sections and navigation elements. There are no immediately obvious red flags indicating a phishing attempt. However, it is always wise to proceed with caution.',
   //   };
+  const isValidDomain = (domain: string): boolean => {
+    // Regular expression for basic domain validation
+    const domainRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+    return domainRegex.test(domain);
+  };
 
+  const determineUrlRisk = (domain: string): 'safe' | 'warning' | 'danger' => {
+    // Check for basic domain validity
+    if (!isValidDomain(domain)) return 'danger';
+
+    // For more complex validation, you could add additional checks
+    // such as checking against known blacklists, domain age, etc.
+    return 'safe';
+  };
+
+  const determineLegitimacyRisk = (score: number): 'safe' | 'warning' | 'danger' => {
+    if (score >= 80) return 'safe';
+    if (score >= 50) return 'warning';
+    return 'danger';
+  };
+
+  const determinePhishingRisk = (riskLevel: string): 'safe' | 'warning' | 'danger' => {
+    const lowRiskTerms = ['low', 'minimal', 'none'];
+    const mediumRiskTerms = ['medium', 'moderate'];
+
+    const normalizedRiskLevel = riskLevel.toLowerCase();
+
+    if (lowRiskTerms.some(term => normalizedRiskLevel.includes(term))) return 'safe';
+    if (mediumRiskTerms.some(term => normalizedRiskLevel.includes(term))) return 'warning';
+    return 'danger';
+  };
   const scanDetails = [
     {
       label: 'URL',
-      value: 'flipkart.com',
+      value: websiteScanData.domain_name,
       icon: <Globe size={18} />,
-      risk: 'safe' as const,
+      risk: determineUrlRisk(websiteScanData.domain_name),
     },
     {
       label: 'Scan Time',
@@ -50,14 +79,15 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
       label: 'Legitimacy Score',
       value: `${websiteScanData.legitimacy_score}%`,
       icon: <Shield size={18} />,
+      risk: determineLegitimacyRisk(websiteScanData.legitimacy_score),
     },
     {
       label: 'Phishing Risk',
       value: websiteScanData.phishing_risk_level,
       icon: <AlertCircle size={18} />,
+      risk: determinePhishingRisk(websiteScanData.phishing_risk_level),
     },
   ];
-
   // Legitimacy score
   const legitimacyScore = websiteScanData.legitimacy_score;
 
