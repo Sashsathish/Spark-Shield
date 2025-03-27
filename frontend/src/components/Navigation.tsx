@@ -109,9 +109,11 @@ export const Navigation = () => {
         initial={{ x: -10, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        className={`${collapsed ? 'w-16' : 'w-64'
-          } transition-all duration-300 ease-in-out h-screen glass-panel fixed md:relative z-30 ${mobileOpen ? 'left-0' : '-left-full md:left-0'
-          }`}
+        className={`${
+          collapsed ? 'w-16' : 'w-64'
+        } transition-all duration-300 ease-in-out h-screen glass-panel fixed md:relative z-30 ${
+          mobileOpen ? 'left-0' : '-left-full md:left-0'
+        }`}
       >
         <div className="flex flex-col h-full py-6">
           <div className="flex items-center px-4 mb-6">
@@ -155,21 +157,24 @@ export const Navigation = () => {
                 <li key={item.name}>
                   <Link
                     to={item.path}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 ${isActive(item.path)
-                      ? 'bg-spark-blue/10 text-white'
-                      : 'text-spark-gray-300 hover:bg-spark-dark-500/70 hover:text-white'
-                      } ${collapsed ? 'justify-center' : 'justify-start'}`}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 ${
+                      isActive(item.path)
+                        ? 'bg-spark-blue/10 text-white'
+                        : 'text-spark-gray-300 hover:bg-spark-dark-500/70 hover:text-white'
+                    } ${collapsed ? 'justify-center' : 'justify-start'}`}
                   >
                     <span
-                      className={`${isActive(item.path) ? 'text-spark-blue' : ''
-                        }`}
+                      className={`${
+                        isActive(item.path) ? 'text-spark-blue' : ''
+                      }`}
                     >
                       {item.icon}
                     </span>
                     {!collapsed && (
                       <span
-                        className={`text-sm ${isActive(item.path) ? 'font-medium' : ''
-                          }`}
+                        className={`text-sm ${
+                          isActive(item.path) ? 'font-medium' : ''
+                        }`}
                       >
                         {item.name}
                       </span>
@@ -186,7 +191,7 @@ export const Navigation = () => {
             </ul>
           </div>
 
-          <div className="px-4 mt-auto">
+          {/* <div className="px-4 mt-auto">
             <div
               className={`glass-card p-3 rounded-lg ${collapsed ? 'text-center' : ''
                 }`}
@@ -207,7 +212,7 @@ export const Navigation = () => {
                 </div>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
       </motion.div>
     </>

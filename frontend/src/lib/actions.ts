@@ -1,11 +1,12 @@
 import axios, { AxiosResponse } from 'axios';
 import FormData from 'form-data';
 
-const API_BASE_URL = 'http://localhost:8080'; // Replace with your actual API base URL
+const API_BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL; // Replace with your actual API base URL
 
 
 
 export async function scanUrl(url: string) {
+    console.log("Working", API_BASE_URL);
     try {
         const response = await axios.get(`${API_BASE_URL}/scan/url`, {
             params: { url },

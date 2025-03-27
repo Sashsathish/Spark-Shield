@@ -33,7 +33,7 @@ export const Layout = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="flex-1  overflow-y-auto p-8"
+          className="flex-1  overflow-y-auto py-4 md:p-8 "
         >
           <Outlet />
         </motion.main>
