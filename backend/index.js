@@ -33,8 +33,8 @@ const VIRUSTOTAL_API = 'https://www.virustotal.com/api/v3';
 const VT_HEADERS = { 'x-apikey': process.env.VIRUSTOTAL_API_KEY };
 
 // Polling configuration
-const MAX_POLLING_ATTEMPTS = 20;
-const POLLING_INTERVAL = 10000; // 3 seconds
+const MAX_POLLING_ATTEMPTS = 30;
+const POLLING_INTERVAL = 15000;
 
 // Helper function to poll for completed results
 async function pollForResults(scan_id) {
@@ -57,7 +57,8 @@ async function pollForResults(scan_id) {
       console.log(`✅ Analysis completed after ${attempts} attempts`);
     } else {
       console.log(
-        `⏳ Analysis status: ${reportResponse.data.data.attributes.status
+        `⏳ Analysis status: ${
+          reportResponse.data.data.attributes.status
         }. Waiting ${POLLING_INTERVAL / 1000} seconds...`
       );
       await new Promise((resolve) => setTimeout(resolve, POLLING_INTERVAL));
