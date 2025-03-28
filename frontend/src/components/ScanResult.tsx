@@ -101,26 +101,26 @@ export const ScanResult = ({
     switch (vtData.result) {
       case 'clean':
         return {
-          icon: <CheckCircle size={28} />,
           title: 'No Threats Detected',
           description: `This ${scanType} appears to be safe. ${vtData.stats.harmless} security vendors confirmed it's harmless.`,
+          icon: <CheckCircle size={28} />,
           color: 'text-spark-green',
           bgColor: 'bg-spark-green/10',
           borderColor: 'border-spark-green/20',
         };
       case 'suspicious':
         return {
-          icon: <AlertTriangle size={28} />,
           title: 'Potentially Suspicious',
           description: `This ${scanType} was flagged as suspicious by ${vtData.stats.suspicious} security vendors.`,
+          icon: <AlertTriangle size={28} />,
           color: 'text-spark-yellow',
           bgColor: 'bg-spark-yellow/10',
           borderColor: 'border-spark-yellow/20',
         };
       case 'malicious':
         return {
-          icon: <XCircle size={28} />,
           title: 'Threat Detected',
+          icon: <XCircle size={28} />,
           description: `This ${scanType} was identified as malicious by ${vtData.stats.malicious} security vendors.`,
           color: 'text-spark-red',
           bgColor: 'bg-spark-red/10',
@@ -128,9 +128,9 @@ export const ScanResult = ({
         };
       default:
         return {
-          icon: <InfoIcon size={28} />,
           title: 'Scan Completed',
           description: `Scan results for this ${scanType} are available.`,
+          icon: <InfoIcon size={28} />,
           color: 'text-spark-blue',
           bgColor: 'bg-spark-blue/10',
           borderColor: 'border-spark-blue/20',

@@ -8,6 +8,9 @@ import {
   CheckCircle,
   Info,
   Globe,
+  XCircle,
+  InfoIcon,
+  AlertTriangle,
 } from 'lucide-react';
 import {
   Table,
@@ -18,27 +21,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { StatusCard } from './ui/StatusCard';
+import { motion } from 'framer-motion';
 
 const GitScanResult = ({ scanData }: { scanData: any }) => {
-  // Actual data from the backend
-  //   const scanData = {
-  //     trust: 'Trusted Owner: Ranjithdurai451',
-  //     results: [
-  //       {
-  //         file: 'repos/94a71eed-79e4-451c-bb88-c30f427b304b/backend/server.js',
-  //         status: '✅ Safe',
-  //       },
-  //       {
-  //         file: 'repos/94a71eed-79e4-451c-bb88-c30f427b304b/frontend/postcss.config.js',
-  //         status: '✅ Safe',
-  //       },
-  //       {
-  //         file: 'repos/94a71eed-79e4-451c-bb88-c30f427b304b/frontend/tailwind.config.js',
-  //         status: '✅ Safe',
-  //       },
-  //     ],
-  //   };
-
   // Calculate counts based on statuses
   const safeCount = scanData.results.filter(
     (item) => item.status === '✅ Safe'
@@ -49,8 +34,53 @@ const GitScanResult = ({ scanData }: { scanData: any }) => {
   const maliciousCount = scanData.results.filter((item) =>
     item.status.includes('❌')
   ).length;
-
   const totalFiles = scanData.results.length;
+
+  // Determine overall status message dynamically
+  const hasMalicious = maliciousCount > 0;
+  const hasSuspicious = suspiciousCount > 0;
+  const hasOnlySafe = safeCount === totalFiles;
+
+  const getStatusMessage = () => {
+    if (hasMalicious) {
+      return {
+        title: 'Threats Detected',
+        subtitle: 'This repository contains malicious files.',
+        icon: <XCircle size={28} />,
+        color: 'text-spark-red',
+        bgColor: 'bg-spark-red/10',
+        borderColor: 'border-spark-red/20',
+      };
+    } else if (hasSuspicious) {
+      return {
+        title: 'Suspicious Files Found',
+        subtitle: 'Some files in this repository require further inspection.',
+        icon: <AlertTriangle size={28} />,
+        color: 'text-spark-yellow',
+        bgColor: 'bg-spark-yellow/10',
+        borderColor: 'border-spark-yellow/20',
+      };
+    } else if (hasOnlySafe) {
+      return {
+        title: 'No Threats Detected',
+        subtitle: 'This repository appears to be safe.',
+        icon: <CheckCircle size={28} />,
+        color: 'text-spark-green',
+        bgColor: 'bg-spark-green/10',
+        borderColor: 'border-spark-green/20',
+      };
+    }
+    return {
+      title: 'Scan Completed',
+      subtitle: 'The repository was scanned successfully.',
+      icon: <InfoIcon size={28} />,
+      color: 'text-spark-blue',
+      bgColor: 'bg-spark-blue/10',
+      borderColor: 'border-spark-blue/20',
+    };
+  };
+
+  const statusMessage = getStatusMessage();
 
   const scanDetails = [
     {
@@ -71,26 +101,126 @@ const GitScanResult = ({ scanData }: { scanData: any }) => {
     },
   ];
 
+  // Dynamic Recommendations based on scan results
+  const getDynamicRecommendations = () => {
+    const recommendations = [];
+
+    if (maliciousCount > 0) {
+      recommendations.push(
+        <li key="malicious-1" className="flex items-start gap-2">
+          <div className="p-1 rounded-full bg-red-500/10 text-red-500 mt-0.5">
+            <AlertCircle size={14} />
+          </div>
+          <span>
+            Immediately quarantine and investigate the{' '}
+            <strong>{maliciousCount}</strong> malicious file(s) detected.
+          </span>
+        </li>,
+        <li key="malicious-2" className="flex items-start gap-2">
+          <div className="p-1 rounded-full bg-red-500/10 text-red-500 mt-0.5">
+            <AlertCircle size={14} />
+          </div>
+          <span>
+            Review recent commits and contributors for potential compromises.
+          </span>
+        </li>
+      );
+    }
+
+    if (suspiciousCount > 0) {
+      recommendations.push(
+        <li key="suspicious-1" className="flex items-start gap-2">
+          <div className="p-1 rounded-full bg-yellow-500/10 text-yellow-500 mt-0.5">
+            <AlertCircle size={14} />
+          </div>
+          <span>
+            Investigate the <strong>{suspiciousCount}</strong> suspicious
+            file(s) for potential vulnerabilities.
+          </span>
+        </li>,
+        <li key="suspicious-2" className="flex items-start gap-2">
+          <div className="p-1 rounded-full bg-yellow-500/10 text-yellow-500 mt-0.5">
+            <AlertCircle size={14} />
+          </div>
+          <span>
+            Use static analysis tools to verify the integrity of flagged files.
+          </span>
+        </li>
+      );
+    }
+
+    if (safeCount > 0) {
+      recommendations.push(
+        <li key="safe-1" className="flex items-start gap-2">
+          <div className="p-1 rounded-full bg-teal-500/10 text-teal-500 mt-0.5">
+            <Shield size={14} />
+          </div>
+          <span>
+            Maintain regular updates to dependencies to prevent future issues.
+          </span>
+        </li>,
+        <li key="safe-2" className="flex items-start gap-2">
+          <div className="p-1 rounded-full bg-teal-500/10 text-teal-500 mt-0.5">
+            <Shield size={14} />
+          </div>
+          <span>
+            Continue integrating security scanning into your CI/CD pipeline.
+          </span>
+        </li>
+      );
+    }
+
+    return recommendations;
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+      {/* Dynamic Status Header */}
       <div className="text-center space-y-3">
-        <div className="p-4 rounded-full bg-teal-500 w-16 h-16 flex items-center justify-center mx-auto">
-          <CheckCircle size={28} className="text-[#0d0f17]" />
+        {/* <div
+          className={`p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto ${
+            statusMessage.color === 'text-red-500'
+              ? 'bg-red-500'
+              : statusMessage.color === 'text-yellow-500'
+              ? 'bg-yellow-500'
+              : 'bg-teal-500'
+          }`}
+        >
+          {statusMessage.icon}
         </div>
-        <h1 className="text-2xl font-bold text-white">No Threats Detected</h1>
+        <h1 className="text-2xl font-bold text-white">{statusMessage.title}</h1>
         <p className="text-gray-400 max-w-xl mx-auto text-sm">
-          This repository appears to be safe. All files have been scanned and
-          verified.
+          {statusMessage.subtitle}
+        </p> */}
+
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{
+            duration: 0.5,
+            type: 'spring',
+            stiffness: 200,
+            damping: 10,
+          }}
+          className={`w-20 h-20 rounded-full ${statusMessage.bgColor} ${statusMessage.color} flex items-center justify-center mx-auto border ${statusMessage.borderColor}`}
+        >
+          {statusMessage.icon}
+        </motion.div>
+        <h2 className="text-2xl font-bold mb-2">{statusMessage.title}</h2>
+        <p className="text-spark-gray-300 max-w-md mx-auto">
+          {statusMessage.subtitle}
         </p>
         <p className="text-teal-500 font-medium">{scanData.trust}</p>
       </div>
 
+      {/* Status Cards */}
       <div className="grid grid-cols-3 gap-4">
         <StatusCard type="harmless" count={safeCount} delay={100} />
         <StatusCard type="suspicious" count={suspiciousCount} delay={200} />
         <StatusCard type="malicious" count={maliciousCount} delay={300} />
       </div>
 
+      {/* Tabs */}
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="w-full flex space-x-4 justify-start border-b border-gray-800 rounded-none bg-transparent p-0 mb-6">
           <TabsTrigger value="overview" className="tab-button">
@@ -104,6 +234,7 @@ const GitScanResult = ({ scanData }: { scanData: any }) => {
           </TabsTrigger>
         </TabsList>
 
+        {/* Overview Tab */}
         <TabsContent value="overview" className="mt-4 space-y-6">
           <div className="glass-card overflow-hidden">
             <div className="flex items-center gap-2 p-4 border-b border-gray-800">
@@ -113,58 +244,27 @@ const GitScanResult = ({ scanData }: { scanData: any }) => {
             <div className="p-4">
               <table className="w-full">
                 <tbody>
-                  <tr className="border-b border-gray-800">
-                    <td className="py-3 flex items-center gap-2">
-                      <GitBranch size={16} className="text-gray-400" />
-                      <span className="text-sm text-gray-400">Owner</span>
-                    </td>
-                    <td className="py-3 text-right flex items-center justify-end gap-2">
-                      <span className="text-sm text-white">
-                        {scanData.trust.replace('Trusted Owner: ', '')}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs px-2 py-0.5 rounded bg-teal-500/10 text-teal-500">
-                          Trusted
+                  {scanDetails.map((detail, index) => (
+                    <tr key={index} className="border-b border-gray-800">
+                      <td className="py-3 flex items-center gap-2">
+                        {detail.icon}
+                        <span className="text-sm text-gray-400">
+                          {detail.label}
                         </span>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr className="border-b border-gray-800">
-                    <td className="py-3 flex items-center gap-2">
-                      <FileCode size={16} className="text-gray-400" />
-                      <span className="text-sm text-gray-400">
-                        Files Scanned
-                      </span>
-                    </td>
-                    <td className="py-3 text-right">
-                      <span className="text-sm text-white">{totalFiles}</span>
-                    </td>
-                  </tr>
-                  <tr className="border-b border-gray-800">
-                    <td className="py-3 flex items-center gap-2">
-                      <Clock size={16} className="text-gray-400" />
-                      <span className="text-sm text-gray-400">Scan Time</span>
-                    </td>
-                    <td className="py-3 text-right">
-                      <span className="text-sm text-white">
-                        {new Date().toLocaleString()}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 flex items-center gap-2">
-                      <Info size={16} className="text-gray-400" />
-                      <span className="text-sm text-gray-400">Status</span>
-                    </td>
-                    <td className="py-3 text-right">
-                      <span className="text-sm text-white">Completed</span>
-                    </td>
-                  </tr>
+                      </td>
+                      <td className="py-3 text-right">
+                        <span className="text-sm text-white">
+                          {detail.value}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
           </div>
 
+          {/* Detection Summary */}
           <div className="glass-card overflow-hidden">
             <div className="flex items-center gap-2 p-4 border-b border-gray-800">
               <Shield size={18} className="text-gray-400" />
@@ -185,7 +285,6 @@ const GitScanResult = ({ scanData }: { scanData: any }) => {
                   ></div>
                 </div>
               </div>
-
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-yellow-500">Suspicious</span>
@@ -202,7 +301,6 @@ const GitScanResult = ({ scanData }: { scanData: any }) => {
                   ></div>
                 </div>
               </div>
-
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-red-500">Malicious</span>
@@ -222,6 +320,7 @@ const GitScanResult = ({ scanData }: { scanData: any }) => {
             </div>
           </div>
 
+          {/* Analysis Insight */}
           <div className="glass-card overflow-hidden">
             <div className="flex items-center gap-2 p-4 border-b border-gray-800">
               <Info size={18} className="text-gray-400" />
@@ -229,9 +328,13 @@ const GitScanResult = ({ scanData }: { scanData: any }) => {
             </div>
             <div className="p-4">
               <p className="text-gray-400 text-sm leading-relaxed">
-                This repository was analyzed and found to be safe. {safeCount}{' '}
-                files were confirmed as harmless, with no suspicious or
-                malicious code detected.
+                {statusMessage.subtitle}{' '}
+                {safeCount > 0 &&
+                  `${safeCount} files were confirmed as harmless.`}
+                {suspiciousCount > 0 &&
+                  `${suspiciousCount} files were flagged as suspicious.`}
+                {maliciousCount > 0 &&
+                  `${maliciousCount} files were detected as malicious.`}
               </p>
               <div className="mt-4 pt-4 border-t border-gray-800">
                 <div className="text-xs text-gray-500 flex items-center gap-1">
@@ -243,6 +346,7 @@ const GitScanResult = ({ scanData }: { scanData: any }) => {
           </div>
         </TabsContent>
 
+        {/* File Results Tab */}
         <TabsContent value="file-results" className="mt-6">
           <div className="glass-card overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-800 flex items-center gap-2">
@@ -300,36 +404,14 @@ const GitScanResult = ({ scanData }: { scanData: any }) => {
           </div>
         </TabsContent>
 
+        {/* Recommendations Tab */}
         <TabsContent value="recommendations" className="mt-6">
           <div className="glass-card p-6">
             <p className="text-gray-400 text-sm leading-relaxed">
-              The repository has been found to be safe. Here are some general
-              security recommendations:
+              Based on the scan results, here are some tailored recommendations:
             </p>
             <ul className="mt-4 space-y-2 text-gray-400 text-sm">
-              <li className="flex items-start gap-2">
-                <div className="p-1 rounded-full bg-teal-500/10 text-teal-500 mt-0.5">
-                  <Shield size={14} />
-                </div>
-                <span>
-                  Regularly update dependencies to patch security
-                  vulnerabilities.
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="p-1 rounded-full bg-teal-500/10 text-teal-500 mt-0.5">
-                  <Shield size={14} />
-                </div>
-                <span>
-                  Implement security scanning as part of your CI/CD pipeline.
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="p-1 rounded-full bg-teal-500/10 text-teal-500 mt-0.5">
-                  <Shield size={14} />
-                </div>
-                <span>Enable branch protection rules for your repository.</span>
-              </li>
+              {getDynamicRecommendations()}
             </ul>
           </div>
         </TabsContent>

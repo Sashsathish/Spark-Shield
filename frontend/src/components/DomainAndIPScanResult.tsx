@@ -5,12 +5,14 @@ import {
   XCircle,
   HelpCircle,
   Clock,
-  Shield,
-  FileText,
   ArrowLeft,
+  AlertCircle,
+  InfoIcon,
+  FileText,
+  Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Progress } from '@/components/ui/progress';
+import { motion } from 'framer-motion';
 
 interface DomainAndIPScanResultProps {
   data: any;
@@ -21,6 +23,7 @@ const DomainAndIPScanResult = ({
   data,
   onNewScan,
 }: DomainAndIPScanResultProps) => {
+  console.log(data);
   const [activeTab, setActiveTab] = useState('overview');
   const domainData = data.data;
   const attributes = domainData.attributes;
@@ -49,21 +52,90 @@ const DomainAndIPScanResult = ({
     (a: number, b: number) => a + b,
     0
   );
-  const isSafe = stats.malicious === 0 && stats.suspicious === 0;
+
+  // Determine the overall result
+  const determineResult = () => {
+    if (stats.malicious > 0) return 'malicious';
+    if (stats.suspicious > 0) return 'suspicious';
+    return 'clean';
+  };
+
+  const result = determineResult();
+
+  // Get UI elements based on result
+  const getResultUI = () => {
+    switch (result) {
+      case 'clean':
+        return {
+          title: 'No Threats Detected',
+          description: `This url appears to be safe. ${stats.harmless} security vendors confirmed it's harmless.`,
+          icon: <CheckCircle size={32} className="text-teal-500" />,
+          color: 'text-teal-500',
+          bgColor: 'bg-teal-900/30',
+          borderColor: 'border-teal-500/20',
+        };
+      case 'suspicious':
+        return {
+          title: 'Potentially Suspicious',
+          description: `This url was flagged as suspicious by ${stats.suspicious} security vendors.`,
+          icon: <AlertTriangle size={32} className="text-yellow-500" />,
+          color: 'text-yellow-500',
+          bgColor: 'bg-yellow-900/30',
+          borderColor: 'border-yellow-500/20',
+        };
+      case 'malicious':
+        return {
+          title: 'Threat Detected',
+          description: `This url was identified as malicious by ${stats.malicious} security vendors.`,
+          icon: <XCircle size={32} className="text-red-500" />,
+          color: 'text-red-500',
+          bgColor: 'bg-red-900/30',
+          borderColor: 'border-red-500/20',
+        };
+      default:
+        return {
+          title: 'Scan Completed',
+          description: 'Scan results for this url are available.',
+          icon: <InfoIcon size={32} className="text-blue-500" />,
+          color: 'text-blue-500',
+          bgColor: 'bg-blue-900/30',
+          borderColor: 'border-blue-500/20',
+        };
+    }
+  };
+
+  const resultUI = getResultUI();
+
+  // Get remediation advice based on result
+  const getRemediationAdvice = () => {
+    if (result === 'clean') {
+      return 'No action needed. This url is safe to visit.';
+    } else if (result === 'suspicious') {
+      return 'Exercise caution when visiting this url. Consider additional verification before proceeding.';
+    } else {
+      return 'Avoid visiting this url. It has been identified as potentially dangerous by multiple security vendors.';
+    }
+  };
 
   return (
     <div className="bg-[#12141D] rounded-lg overflow-hidden max-w-3xl mx-auto text-gray-200 border border-gray-800">
       <div className="p-8 text-center">
-        <div className="w-16 h-16 rounded-full bg-teal-900/30 flex items-center justify-center mx-auto mb-4">
-          <CheckCircle size={32} className="text-teal-500" />
-        </div>
-
-        <h1 className="text-2xl font-bold mb-2 text-white">
-          No Threats Detected
-        </h1>
-        <p className="text-gray-400 text-balance max-w-lg mx-auto">
-          This url appears to be safe. {stats.harmless} security vendors
-          confirmed it's harmless.
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{
+            duration: 0.5,
+            type: 'spring',
+            stiffness: 200,
+            damping: 10,
+          }}
+          className={`w-20 h-20 rounded-full ${resultUI?.bgColor} ${resultUI.color} flex items-center justify-center mb-4 mx-auto border ${resultUI.borderColor}`}
+        >
+          {resultUI.icon}
+        </motion.div>
+        <h2 className="text-2xl font-bold mb-2">{resultUI.title}</h2>
+        <p className="text-spark-gray-300 max-w-md mx-auto">
+          {resultUI.description}
         </p>
 
         <div className="grid grid-cols-5 gap-2 mt-10">
@@ -105,6 +177,7 @@ const DomainAndIPScanResult = ({
         </div>
       </div>
 
+      {/* Existing tab navigation remains the same */}
       <div className="border-b border-gray-800">
         <div className="flex">
           <button
@@ -313,7 +386,7 @@ const DomainAndIPScanResult = ({
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-[#12141D] p-3 rounded-md">
                   <div className="text-gray-400 text-sm">Item Type</div>
-                  <div className="font-medium">Url</div>
+                  <div className="font-medium">{attributes.type}</div>
                 </div>
                 <div className="bg-[#12141D] p-3 rounded-md">
                   <div className="text-gray-400 text-sm">Risk Level</div>
@@ -342,43 +415,137 @@ const DomainAndIPScanResult = ({
           </div>
         )}
 
+        {/* Updated Recommendations Tab */}
         {activeTab === 'recommendations' && (
-          <div className="bg-[#191C27] rounded-lg p-5">
-            <h3 className="text-md font-semibold mb-4 text-white">
-              Safety Recommendations
-            </h3>
-            <p className="text-gray-400 mb-4 text-sm">
-              This domain appears to be safe based on our analysis. Here are
-              some general safety tips:
-            </p>
-            <ul className="space-y-3 text-gray-300 text-sm">
-              <li className="flex items-start">
-                <CheckCircle className="h-4 w-4 text-teal-500 mr-2 shrink-0 mt-0.5" />
-                <span>
-                  Always verify the domain name before entering sensitive
-                  information
-                </span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="h-4 w-4 text-teal-500 mr-2 shrink-0 mt-0.5" />
-                <span>Use strong, unique passwords for different websites</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="h-4 w-4 text-teal-500 mr-2 shrink-0 mt-0.5" />
-                <span>Keep your browser and operating system up to date</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="h-4 w-4 text-teal-500 mr-2 shrink-0 mt-0.5" />
-                <span>
-                  Consider using a password manager and two-factor
-                  authentication
-                </span>
-              </li>
-            </ul>
+          <div className="space-y-6">
+            {(result === 'suspicious' || result === 'malicious') && (
+              <div
+                className={`rounded-lg p-5 ${
+                  result === 'suspicious'
+                    ? 'bg-yellow-500/10 border border-yellow-500/20'
+                    : 'bg-red-500/10 border border-red-500/20'
+                }`}
+              >
+                <div className="flex items-start">
+                  {result === 'suspicious' ? (
+                    <AlertTriangle
+                      size={18}
+                      className="text-yellow-500 mt-0.5 mr-2 flex-shrink-0"
+                    />
+                  ) : (
+                    <AlertCircle
+                      size={18}
+                      className="text-red-500 mt-0.5 mr-2 flex-shrink-0"
+                    />
+                  )}
+                  <div>
+                    <h3 className="text-lg font-medium mb-2">
+                      {result === 'suspicious' ? 'Caution Advised' : 'Warning'}
+                    </h3>
+                    <p className="text-sm">{getRemediationAdvice()}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-[#191C27] rounded-lg p-5">
+              <h3 className="text-md font-semibold mb-4 text-white">
+                Safety Recommendations
+              </h3>
+
+              <ul className="space-y-3 text-gray-300 text-sm">
+                {result === 'clean' && (
+                  <>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-4 w-4 text-teal-500 mr-2 shrink-0 mt-0.5" />
+                      <span>
+                        Continue to exercise standard online safety practices
+                      </span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-4 w-4 text-teal-500 mr-2 shrink-0 mt-0.5" />
+                      <span>
+                        Verify the domain name before entering any sensitive
+                        information
+                      </span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-4 w-4 text-teal-500 mr-2 shrink-0 mt-0.5" />
+                      <span>Keep your security software up to date</span>
+                    </li>
+                  </>
+                )}
+
+                {result === 'suspicious' && (
+                  <>
+                    <li className="flex items-start">
+                      <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2 shrink-0 mt-0.5" />
+                      <span>
+                        Do not enter any sensitive information on this url
+                      </span>
+                    </li>
+                    <li className="flex items-start">
+                      <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2 shrink-0 mt-0.5" />
+                      <span>
+                        Consider using an alternative, verified source
+                      </span>
+                    </li>
+                    <li className="flex items-start">
+                      <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2 shrink-0 mt-0.5" />
+                      <span>
+                        Run additional security scans or use different security
+                        tools
+                      </span>
+                    </li>
+                    <li className="flex items-start">
+                      <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2 shrink-0 mt-0.5" />
+                      <span>
+                        Report the suspicious url to your security team
+                      </span>
+                    </li>
+                  </>
+                )}
+
+                {result === 'malicious' && (
+                  <>
+                    <li className="flex items-start">
+                      <XCircle className="h-4 w-4 text-red-500 mr-2 shrink-0 mt-0.5" />
+                      <span>Immediately avoid accessing this url</span>
+                    </li>
+                    <li className="flex items-start">
+                      <XCircle className="h-4 w-4 text-red-500 mr-2 shrink-0 mt-0.5" />
+                      <span>
+                        Do not enter any personal or sensitive information
+                      </span>
+                    </li>
+                    <li className="flex items-start">
+                      <XCircle className="h-4 w-4 text-red-500 mr-2 shrink-0 mt-0.5" />
+                      <span>
+                        Clear browser cache and run a full system scan
+                      </span>
+                    </li>
+                    <li className="flex items-start">
+                      <XCircle className="h-4 w-4 text-red-500 mr-2 shrink-0 mt-0.5" />
+                      <span>
+                        Report this malicious url to your security team or
+                        hosting provider
+                      </span>
+                    </li>
+                    <li className="flex items-start">
+                      <XCircle className="h-4 w-4 text-red-500 mr-2 shrink-0 mt-0.5" />
+                      <span>
+                        Consider changing passwords for critical accounts
+                      </span>
+                    </li>
+                  </>
+                )}
+              </ul>
+            </div>
           </div>
         )}
       </div>
 
+      {/* Existing New Scan button remains the same */}
       <div className="p-4 flex justify-center">
         <button
           onClick={onNewScan}

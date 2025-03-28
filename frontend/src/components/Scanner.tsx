@@ -10,7 +10,6 @@ import {
   Loader2,
 } from 'lucide-react';
 
-import { ScanResult } from './ScanResult';
 import {
   scanUrl,
   scanDomain,
@@ -21,6 +20,7 @@ import {
 } from '../lib/actions';
 import { ScannerProps, ScanType } from '@/lib/types';
 import { validateInput } from '@/lib/utils';
+import { ScanResult } from './ScanResult';
 
 export const Scanner: React.FC<ScannerProps> = ({
   title,

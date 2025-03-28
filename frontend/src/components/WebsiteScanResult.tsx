@@ -34,7 +34,8 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
   //   };
   const isValidDomain = (domain: string): boolean => {
     // Regular expression for basic domain validation
-    const domainRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+    const domainRegex =
+      /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
     return domainRegex.test(domain);
   };
 
@@ -47,20 +48,26 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
     return 'safe';
   };
 
-  const determineLegitimacyRisk = (score: number): 'safe' | 'warning' | 'danger' => {
+  const determineLegitimacyRisk = (
+    score: number
+  ): 'safe' | 'warning' | 'danger' => {
     if (score >= 80) return 'safe';
     if (score >= 50) return 'warning';
     return 'danger';
   };
 
-  const determinePhishingRisk = (riskLevel: string): 'safe' | 'warning' | 'danger' => {
+  const determinePhishingRisk = (
+    riskLevel: string
+  ): 'safe' | 'warning' | 'danger' => {
     const lowRiskTerms = ['low', 'minimal', 'none'];
     const mediumRiskTerms = ['medium', 'moderate'];
 
     const normalizedRiskLevel = riskLevel.toLowerCase();
 
-    if (lowRiskTerms.some(term => normalizedRiskLevel.includes(term))) return 'safe';
-    if (mediumRiskTerms.some(term => normalizedRiskLevel.includes(term))) return 'warning';
+    if (lowRiskTerms.some((term) => normalizedRiskLevel.includes(term)))
+      return 'safe';
+    if (mediumRiskTerms.some((term) => normalizedRiskLevel.includes(term)))
+      return 'warning';
     return 'danger';
   };
   const scanDetails = [
@@ -118,7 +125,7 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
         <h1 className="text-3xl font-bold">Legitimate Website Detected</h1>
         <p className="text-white/60 max-w-xl mx-auto">
           This website appears to be legitimate with a {legitimacyScore}%
-          legitimacy score. No phishing indicators detected.
+          legitimacy score. No .
         </p>
       </div>
 
