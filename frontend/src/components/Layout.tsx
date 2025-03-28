@@ -6,11 +6,13 @@ import { Navigation } from './Navigation';
 
 export const Layout = () => {
   const [loading, setLoading] = useState(false);
+  const [loaderCount, setLoaderCount] = useState(0);
   const location = useLocation();
 
   useEffect(() => {
     // Only show loader for dashboard page (root path)
-    if (location.pathname === '/') {
+    if (loaderCount === 0) {
+      setLoaderCount((prev) => prev + 1);
       setLoading(true);
       const timer = setTimeout(() => {
         setLoading(false);

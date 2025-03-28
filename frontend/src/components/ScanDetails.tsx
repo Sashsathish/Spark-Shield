@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  File,
-  ShieldCheck,
-  AlertTriangle,
-  XCircle,
-} from 'lucide-react';
+import { File, ShieldCheck, AlertTriangle, XCircle } from 'lucide-react';
 
 interface ScanDetailsItemProps {
   label: string;
@@ -49,8 +44,8 @@ const ScanDetailsItem: React.FC<ScanDetailsItemProps> = ({
           {risk === 'safe'
             ? 'Safe'
             : risk === 'warning'
-              ? 'Suspicious'
-              : 'Malicious'}
+            ? 'Suspicious'
+            : 'Malicious'}
         </span>
       </div>
     );

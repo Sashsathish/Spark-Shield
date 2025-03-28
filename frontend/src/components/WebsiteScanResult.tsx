@@ -7,44 +7,24 @@ import {
   Check,
   AlertTriangle,
   Info,
+  CheckCircle,
+  InfoIcon,
+  XCircle,
 } from 'lucide-react';
 import { ScanDetails } from './ScanDetails';
+import { motion } from 'framer-motion';
 
 const WebsiteScanResult = ({ websiteScanData }: any) => {
-  // Actual data based on your provided format
-  //   const websiteScanData = {
-  //     legitimacy_score: 90,
-  //     red_flags: [],
-  //     verified_elements: [
-  //       'URL is flipkart.com',
-  //       'Flipkart logo is present',
-  //       'Search bar for products',
-  //       'Category sections (Kilos, Mobiles, Fashion, etc.)',
-  //       'Login, Cart, Become a Seller options',
-  //       'Promotional banner for Office Chairs',
-  //     ],
-  //     phishing_risk_level: 'Low',
-  //     suggested_actions: [
-  //       'Always double-check the URL before entering any personal information.',
-  //       'Ensure the site has a valid SSL certificate (HTTPS).',
-  //       "If you're still unsure, navigate to the site directly by typing the URL in your browser instead of clicking on a link.",
-  //     ],
-  //     full_analysis:
-  //       'The screenshot appears to be a legitimate Flipkart website. The URL in the address bar is flipkart.com. The site features the Flipkart logo, a prominent search bar, and familiar category sections and navigation elements. There are no immediately obvious red flags indicating a phishing attempt. However, it is always wise to proceed with caution.',
-  //   };
+  // Helper function to validate domain
   const isValidDomain = (domain: string): boolean => {
-    // Regular expression for basic domain validation
     const domainRegex =
       /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
     return domainRegex.test(domain);
   };
 
+  // Risk determination functions
   const determineUrlRisk = (domain: string): 'safe' | 'warning' | 'danger' => {
-    // Check for basic domain validity
     if (!isValidDomain(domain)) return 'danger';
-
-    // For more complex validation, you could add additional checks
-    // such as checking against known blacklists, domain age, etc.
     return 'safe';
   };
 
@@ -61,15 +41,15 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
   ): 'safe' | 'warning' | 'danger' => {
     const lowRiskTerms = ['low', 'minimal', 'none'];
     const mediumRiskTerms = ['medium', 'moderate'];
-
     const normalizedRiskLevel = riskLevel.toLowerCase();
-
     if (lowRiskTerms.some((term) => normalizedRiskLevel.includes(term)))
       return 'safe';
     if (mediumRiskTerms.some((term) => normalizedRiskLevel.includes(term)))
       return 'warning';
     return 'danger';
   };
+
+  // Dynamic scan details
   const scanDetails = [
     {
       label: 'URL',
@@ -95,10 +75,9 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
       risk: determinePhishingRisk(websiteScanData.phishing_risk_level),
     },
   ];
-  // Legitimacy score
-  const legitimacyScore = websiteScanData.legitimacy_score;
 
-  // Determine score color
+  // Legitimacy score UI logic
+  const legitimacyScore = websiteScanData.legitimacy_score;
   let scoreColorClass = 'text-teal-500';
   let scoreIcon = <Check size={16} />;
   let scoreBgClass = 'bg-teal-500/10';
@@ -115,20 +94,81 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
     scoreBgClass = 'bg-amber-500/10';
     scoreLabel = 'Exercise Caution';
   }
+  const determineResult = () => {
+    if (legitimacyScore < 50) return 'malicious';
+    if (legitimacyScore < 80) return 'suspicious';
+    return 'clean';
+  };
+
+  const result = determineResult();
+
+  const getResultUI = () => {
+    switch (determineResult()) {
+      case 'clean':
+        return {
+          title: 'No Threats Detected',
+          description: `This website appears to be safe. No significant risks were detected.`,
+          icon: <CheckCircle size={32} className="text-teal-500" />,
+          color: 'text-teal-500',
+          bgColor: 'bg-teal-900/30',
+          borderColor: 'border-teal-500/20',
+        };
+      case 'suspicious':
+        return {
+          title: 'Suspicious Website Detected',
+          description: `This website was flagged as suspicious. Exercise caution when interacting with it.`,
+          icon: <AlertTriangle size={32} className="text-yellow-500" />,
+          color: 'text-yellow-500',
+          bgColor: 'bg-yellow-900/30',
+          borderColor: 'border-yellow-500/20',
+        };
+      case 'malicious':
+        return {
+          title: 'Potentially Malicious Website Detected',
+          description: `This website was identified as potentially malicious. Avoid interacting with it.`,
+          icon: <XCircle size={32} className="text-red-500" />,
+          color: 'text-red-500',
+          bgColor: 'bg-red-900/30',
+          borderColor: 'border-red-500/20',
+        };
+      default:
+        return {
+          title: 'Scan Completed',
+          description: 'Scan results for this website are available.',
+          icon: <Info size={32} className="text-blue-500" />,
+          color: 'text-blue-500',
+          bgColor: 'bg-blue-900/30',
+          borderColor: 'border-blue-500/20',
+        };
+    }
+  };
+
+  const resultUI = getResultUI();
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10 space-y-10">
+      {/* Header */}
       <div className="text-center space-y-4 animate-fade-in">
-        <div className="p-4 rounded-full bg-teal-500/10 w-16 h-16 flex items-center justify-center mx-auto">
-          <Shield size={28} className="text-teal-500" />
-        </div>
-        <h1 className="text-3xl font-bold">Legitimate Website Detected</h1>
-        <p className="text-white/60 max-w-xl mx-auto">
-          This website appears to be legitimate with a {legitimacyScore}%
-          legitimacy score. No .
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{
+            duration: 0.5,
+            type: 'spring',
+            stiffness: 200,
+            damping: 10,
+          }}
+          className={`w-20 h-20 rounded-full ${resultUI?.bgColor} ${resultUI.color} flex items-center justify-center mb-4 mx-auto border ${resultUI.borderColor}`}
+        >
+          {resultUI.icon}
+        </motion.div>
+        <h2 className="text-2xl font-bold mb-2">{resultUI.title}</h2>
+        <p className="text-spark-gray-300 max-w-md mx-auto">
+          {resultUI.description}
         </p>
       </div>
 
+      {/* Tabs */}
       <Tabs defaultValue="overview" className="animate-fade-in">
         <TabsList className="glass-card p-1">
           <TabsTrigger value="overview" className="tab-button">
@@ -142,10 +182,11 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
           </TabsTrigger>
         </TabsList>
 
+        {/* Overview Tab */}
         <TabsContent value="overview" className="mt-6 space-y-6">
           <ScanDetails title="Scan Details" items={scanDetails} />
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Legitimacy Score Card */}
             <div className="glass-card overflow-hidden">
               <div className="px-6 py-4 border-b border-white/5">
                 <h3 className="font-medium">Legitimacy Score</h3>
@@ -191,6 +232,7 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
               </div>
             </div>
 
+            {/* Full Analysis Card */}
             <div className="glass-card overflow-hidden">
               <div className="px-6 py-4 border-b border-white/5">
                 <h3 className="font-medium">Full Analysis</h3>
@@ -199,7 +241,6 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
                 <p className="text-white/70 leading-relaxed">
                   {websiteScanData.full_analysis}
                 </p>
-
                 <div className="mt-4 pt-4 border-t border-white/10">
                   <div className="flex items-center gap-2 text-sm font-medium text-white/80">
                     <Info size={16} className="text-white/60" />
@@ -215,6 +256,7 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
           </div>
         </TabsContent>
 
+        {/* Verified Elements Tab */}
         <TabsContent value="verified-elements" className="mt-6">
           <div className="glass-card overflow-hidden">
             <div className="px-6 py-4 border-b border-white/5">
@@ -222,19 +264,29 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
             </div>
             <div className="p-6">
               <div className="space-y-3">
-                {websiteScanData.verified_elements.map((element, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-white/5"
-                  >
-                    <div className="p-1 rounded-full bg-teal-500/10 text-teal-500">
-                      <Check size={14} />
+                {websiteScanData.verified_elements.length > 0 ? (
+                  websiteScanData.verified_elements.map((element, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-white/5"
+                    >
+                      <div className="p-1 rounded-full bg-teal-500/10 text-teal-500">
+                        <Check size={14} />
+                      </div>
+                      <span className="text-sm text-white/80">{element}</span>
                     </div>
-                    <span className="text-sm text-white/80">{element}</span>
+                  ))
+                ) : (
+                  <div className="p-4 rounded-lg border border-white/10 bg-teal-500/5">
+                    <div className="flex items-center gap-2 font-medium text-teal-500">
+                      <Shield size={16} />
+                      No Verified Elements Found
+                    </div>
                   </div>
-                ))}
+                )}
               </div>
 
+              {/* Red Flags Section */}
               {websiteScanData.red_flags.length > 0 && (
                 <div className="mt-6">
                   <div className="flex items-center gap-2 text-sm font-medium text-white/80 mb-3">
@@ -256,23 +308,11 @@ const WebsiteScanResult = ({ websiteScanData }: any) => {
                   </div>
                 </div>
               )}
-
-              {websiteScanData.red_flags.length === 0 && (
-                <div className="mt-6 p-4 rounded-lg border border-white/10 bg-teal-500/5">
-                  <div className="flex items-center gap-2 font-medium text-teal-500">
-                    <Shield size={16} />
-                    No Red Flags Detected
-                  </div>
-                  <p className="mt-2 text-sm text-white/70">
-                    Our analysis found no suspicious elements or patterns that
-                    would indicate this website is not legitimate.
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </TabsContent>
 
+        {/* Recommendations Tab */}
         <TabsContent value="recommendations" className="mt-6">
           <div className="glass-card p-6">
             <p className="text-white/70 leading-relaxed">
