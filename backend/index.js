@@ -116,7 +116,7 @@ app.get('/scan/url', async (req, res) => {
     res.json(pollResult.response.data);
   } catch (error) {
     console.error(`❌ Error scanning URL: ${url}`, error.message);
-    res.status(500).json({
+    res.status(500).json({ 
       error: 'Error scanning URL',
       details: error.response?.data || error.message,
     });
